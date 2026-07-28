@@ -20,6 +20,13 @@ class Shipment(models.Model):
 
     product = models.CharField(max_length=255)
 
+    goods_image = models.URLField(
+        max_length=500,
+        blank=True,
+        null=True,
+        help_text="URL to an image of the goods",
+    )
+
     quantity = models.PositiveIntegerField(default=1)
 
     payment_mode = models.CharField(max_length=20)
@@ -81,7 +88,7 @@ class MovementLocation(models.Model):
     status = models.CharField(max_length=50)
 
     def __str__(self):
-        return f"Movement at {self.location} for Shipment {self.shipment.shipment_id}"
+        return f"Movement at {self.location} for Shipment {self.shipment.tracking_id}"
 
 
 class DeliveryContacts(models.Model):
@@ -96,4 +103,4 @@ class DeliveryContacts(models.Model):
     sender_address = models.TextField()
 
     def __str__(self):
-        return f"Contact {self.contact_name} for Shipment {self.shipment.shipment_id}"
+        return f"Contact {self.contact_name} for Shipment {self.shipment.tracking_id}"

@@ -57,6 +57,11 @@ class DeliveryContactsSerializer(serializers.ModelSerializer):
 
 
 class ShipmentSerializer(serializers.ModelSerializer):
+    goods_image = serializers.URLField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+    )
     info = ShipmentInfoSerializer(required=True)
     movement_locations = MovementLocationSerializer(
         many=True,
