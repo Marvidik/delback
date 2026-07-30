@@ -11,6 +11,7 @@ class Shipment(models.Model):
         unique=True,
         editable=False,
     )
+    map_movement = models.BooleanField(default=False, help_text="Indicates if the shipment's movement should be tracked in real time in FE")
 
     package_type = models.CharField(max_length=20)
 
