@@ -20,11 +20,11 @@ class Shipment(models.Model):
 
     product = models.CharField(max_length=255)
 
-    goods_image = models.URLField(
-        max_length=500,
+    goods_image = models.JSONField(
+        default=list,
         blank=True,
         null=True,
-        help_text="URL to an image of the goods",
+        help_text="List of image URLs for the goods",
     )
 
     quantity = models.PositiveIntegerField(default=1)
@@ -71,6 +71,18 @@ class ShipmentInfo(models.Model):
     latest_message = models.CharField(max_length=255)
     status = models.CharField(max_length=50)
     current_location = models.CharField(max_length=255)
+    current_location_latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        blank=True,
+        null=True,
+    )
+    current_location_longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        blank=True,
+        null=True,
+    )
     movement_status = models.CharField(max_length=50)
     expected_delivery_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -86,6 +98,18 @@ class MovementLocation(models.Model):
     location = models.CharField(max_length=255)
     timestamp = models.DateTimeField()
     status = models.CharField(max_length=50)
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        blank=True,
+        null=True,
+    )
+    longitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        blank=True,
+        null=True,
+    )
 
     def __str__(self):
         return f"Movement at {self.location} for Shipment {self.shipment.tracking_id}"

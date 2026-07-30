@@ -35,6 +35,19 @@ class LoginSerializer(serializers.Serializer):
 
 
 class ShipmentInfoSerializer(serializers.ModelSerializer):
+    current_location_latitude = serializers.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        required=False,
+        allow_null=True,
+    )
+    current_location_longitude = serializers.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        required=False,
+        allow_null=True,
+    )
+
     class Meta:
         model = ShipmentInfo
         exclude = ("shipment",)
@@ -42,6 +55,18 @@ class ShipmentInfoSerializer(serializers.ModelSerializer):
 
 class MovementLocationSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
+    latitude = serializers.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        required=False,
+        allow_null=True,
+    )
+    longitude = serializers.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        required=False,
+        allow_null=True,
+    )
 
     class Meta:
         model = MovementLocation
@@ -56,10 +81,30 @@ class DeliveryContactsSerializer(serializers.ModelSerializer):
         exclude = ("shipment",)
 
 
+class GoodsImageField(serializers.ListField):
+    child = serializers.URLField(allow_blank=False)
+
+    def to_internal_value(self, data):
+        if data in (None, ""):
+            return []
+
+        if isinstance(data, str):
+            data = [data]
+
+        try:
+            return super().to_internal_value(data)
+        except serializers.ValidationError as exc:
+            raise serializers.ValidationError("Expected a URL string or a list of URL strings.") from exc
+
+    def to_representation(self, value):
+        if value in (None, ""):
+            return []
+        return super().to_representation(value)
+
+
 class ShipmentSerializer(serializers.ModelSerializer):
-    goods_image = serializers.URLField(
+    goods_image = GoodsImageField(
         required=False,
-        allow_blank=True,
         allow_null=True,
     )
     info = ShipmentInfoSerializer(required=True)

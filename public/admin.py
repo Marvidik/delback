@@ -17,13 +17,21 @@ class ShipmentAdmin(admin.ModelAdmin):
 
 @admin.register(ShipmentInfo)
 class ShipmentInfoAdmin(admin.ModelAdmin):
-    list_display = ("shipment", "reference", "status", "expected_delivery_date")
-    search_fields = ("reference", "status")
+    list_display = (
+        "shipment",
+        "reference",
+        "status",
+        "current_location",
+        "current_location_latitude",
+        "current_location_longitude",
+        "expected_delivery_date",
+    )
+    search_fields = ("reference", "status", "current_location")
 
 
 @admin.register(MovementLocation)
 class MovementLocationAdmin(admin.ModelAdmin):
-    list_display = ("shipment", "location", "timestamp", "status")
+    list_display = ("shipment", "location", "timestamp", "status", "latitude", "longitude")
     list_filter = ("status",)
 
 
