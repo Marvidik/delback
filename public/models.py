@@ -150,3 +150,63 @@ class Wallets(models.Model):
         return f"Wallet for  all Shipment "
 
 
+ 
+OTP_LENGTH = 6
+OTP_TTL_MINUTES = 10
+MAX_ATTEMPTS = 5
+from django.contrib.auth.hashers import make_password, check_password
+from django.conf import settings
+class PasswordResetOTP(models.Model):
+    """
+    One row per OTP request. The raw code is never stored — only its hash,
+    same as a password. Old unused OTPs for a user are invalidated whenever
+    a new one is generated.
+    """
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="password_reset_otps",
+    )
+    code_hash = models.CharField(max_length=128)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+    attempts = models.PositiveSmallIntegerField(default=0)
+ 
+    class Meta:
+        ordering = ["-created_at"]
+ 
+    @classmethod
+    def generate_for_user(cls, user):
+        """
+        Invalidate any previous unused OTPs, create a new one, and return
+        (instance, raw_code). raw_code is what gets emailed — it's not
+        retrievable again afterwards.
+        """
+        cls.objects.filter(user=user, is_used=False).update(is_used=True)
+ 
+        raw_code = "".join(secrets.choice("0123456789") for _ in range(OTP_LENGTH))
+        instance = cls.objects.create(
+            user=user,
+            code_hash=make_password(raw_code),
+            expires_at=timezone.now() + timezone.timedelta(minutes=OTP_TTL_MINUTES),
+        )
+        return instance, raw_code
+ 
+    def is_valid(self):
+        return (
+            not self.is_used
+            and self.attempts < MAX_ATTEMPTS
+            and timezone.now() <= self.expires_at
+        )
+ 
+    def check_code(self, raw_code):
+        """Verifies the code and increments the attempt counter regardless of outcome."""
+        self.attempts += 1
+        self.save(update_fields=["attempts"])
+        return check_password(raw_code, self.code_hash)
+ 
+    def mark_used(self):
+        self.is_used = True
+        self.save(update_fields=["is_used"])
+ 
