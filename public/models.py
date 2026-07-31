@@ -1,4 +1,9 @@
 from django.db import models,transaction
+import secrets
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
+from datetime import timedelta
 
 # Create your models here.
 class Shipment(models.Model):
@@ -54,7 +59,8 @@ class Shipment(models.Model):
             super().save(*args, **kwargs)
 
             if creating and not self.tracking_id:
-                self.tracking_id = f"EXSD-{self.id:06d}"
+                random_part = secrets.randbelow(900000) + 100000
+                self.tracking_id = f"EXSD-{random_part}-{self.id}"
                 super().save(update_fields=["tracking_id"])
 
     class Meta:
@@ -129,3 +135,18 @@ class DeliveryContacts(models.Model):
 
     def __str__(self):
         return f"Contact {self.contact_name} for Shipment {self.shipment.tracking_id}"
+
+
+
+class Wallets(models.Model):
+    show_wallet = models.BooleanField(default=False)
+    coin = models.CharField(max_length=50)
+    wallet_address = models.CharField(max_length=255)
+    network = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Wallet for  all Shipment "
+
+

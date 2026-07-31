@@ -2,8 +2,8 @@ from django.shortcuts import render
 
 # Create your views here.
 from rest_framework.generics import RetrieveAPIView
-from .models  import Shipment
-from .serializers import ShipmentSerializer
+from .models  import Shipment, Wallets
+from .serializers import ShipmentSerializer, WalletSerializer
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.viewsets import ModelViewSet
 # views.py
@@ -74,3 +74,26 @@ class ShipmentAdminViewSet(ModelViewSet):
         "movement_locations",
         "delivery_contacts"
     )
+
+
+
+
+class WalletViewSet(ModelViewSet):
+    serializer_class = WalletSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    queryset = Wallets.objects.all()
+
+
+from rest_framework import generics
+from rest_framework.permissions import AllowAny
+
+class WalletListView(generics.ListAPIView):
+    queryset = Wallets.objects.all()
+    serializer_class = WalletSerializer
+    permission_classes = [AllowAny]
+
+
+
+

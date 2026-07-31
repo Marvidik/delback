@@ -3,11 +3,13 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     ShipmentTrackingView,
-    ShipmentAdminViewSet,LoginView
+    ShipmentAdminViewSet,LoginView,
+    WalletListView,WalletViewSet
 )
 
 router = DefaultRouter()
 router.register("admin/shipments", ShipmentAdminViewSet, basename="admin-shipments")
+router.register("admin/wallets",WalletViewSet,basename="admin-wallets")
 
 urlpatterns = [
     # Public tracking endpoint
@@ -20,4 +22,5 @@ urlpatterns = [
 
     # Protected CRUD endpoints
     path("administrator/", include(router.urls)),
+    path("wallets/", WalletListView.as_view(), name="wallet-list"),
 ]

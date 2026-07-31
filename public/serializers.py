@@ -5,6 +5,7 @@ from .models import (
     ShipmentInfo,
     MovementLocation,
     DeliveryContacts,
+    Wallets,
 )
 from django.contrib.auth import authenticate
 
@@ -188,3 +189,19 @@ class ShipmentSerializer(serializers.ModelSerializer):
                 )
 
         return instance
+
+
+
+
+class WalletSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Wallets
+        fields = "__all__"
+        read_only_fields = (
+            "id",
+            "created_at",
+            "updated_at",
+        )
+
+
+
